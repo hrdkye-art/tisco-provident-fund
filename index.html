@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แจ้งเปลี่ยนแปลงอัตราเงินสะสมกองทุนสำรองเลี้ยงชีพ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-img {
+            width: 150px;
+            height: auto;
+            max-height: 120px;
+            object-fit: contain;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .info-box.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .rate-selection {
+            display: none;
+        }
+
+        .rate-selection.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .rate-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .rate-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .rate-option {
+            position: relative;
+        }
+
+        .rate-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .rate-option label {
+            display: block;
+            padding: 20px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 700;
+            color: #667eea;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rate-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .rate-option label:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .rate-option.no-change label {
+            color: #dc2626;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .rate-option.no-change input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            display: none;
+        }
+
+        .btn-success.show {
+            display: block;
+        }
+
+        .rate-option.disabled label {
+            background: #f3f4f6;
+            color: #9ca3af;
+            border-color: #e5e7eb;
+            cursor: not-allowed;
+        }
+
+        .rate-option.disabled input[type="radio"] {
+            cursor: not-allowed;
+        }
+
+        .rate-option.disabled:hover label {
+            transform: none;
+            border-color: #e5e7eb;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            border-radius: 10px;
+            padding: 15px;
+            color: #991b1b;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal Popup */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .modal-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .modal-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://i.postimg.cc/c4J2c0Gs/images.png" alt="TISCO Logo" class="logo-img" onerror="this.style.display='none'">
+            <h1>แจ้งเปลี่ยนแปลงอัตราเงินสะสมกองทุนสำรองเลี้ยงชีพ</h1>
+            <p class="subtitle">กองทุนสำรองเลี้ยงชีพ TISCO</p>
+        </div>
+
+        <form id="surveyForm">
+            <div class="form-group">
+                <label for="empId">รหัสพนักงาน <span style="color: red;">*</span></label>
+                <input type="text" id="empId" placeholder="กรุณาระบุรหัสพนักงาน" required>
+                <div class="error-message" id="errorMsg">ไม่พบข้อมูลพนักงาน กรุณาตรวจสอบรหัสพนักงานอีกครั้ง</div>
+            </div>
+
+            <button type="button" class="btn btn-primary" id="searchBtn">ค้นหาข้อมูล</button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>กำลังโหลดข้อมูล...</p>
+            </div>
+
+            <div class="info-box" id="infoBox">
+                <h3 style="margin-bottom: 15px; color: #667eea;">ข้อมูลพนักงาน</h3>
+                <div class="info-row">
+                    <span class="info-label">ฝ่าย:</span>
+                    <span class="info-value" id="division">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">แผนก:</span>
+                    <span class="info-value" id="department">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">กลุ่มงาน:</span>
+                    <span class="info-value" id="workgroup">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">อายุงาน:</span>
+                    <span class="info-value" id="yearsOfService">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">อัตราเงินสะสมปัจจุบัน:</span>
+                    <span class="info-value" id="currentRate" style="color: #667eea; font-size: 18px;">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">อัตราขั้นต่ำที่สามารถเลือกได้:</span>
+                    <span class="info-value" id="minimumRate" style="color: #ef4444; font-size: 18px;">-</span>
+                </div>
+            </div>
+
+            <div class="rate-selection" id="rateSelection">
+                <label>เลือกอัตราเงินสะสมเพื่อนำส่งเข้ากองทุนสำรองเลี้ยงชีพ <span style="color: red;">*</span></label>
+                <p style="margin: 10px 0; color: #666; font-size: 14px;">
+                    <strong>หมายเหตุ:</strong> ตัวเลือกที่แสดงขึ้นอยู่กับอายุงานของคุณ
+                </p>
+                <div class="rate-options">
+                    <div class="rate-option">
+                        <input type="radio" id="rate6" name="newRate" value="6">
+                        <label for="rate6">6%</label>
+                    </div>
+                    <div class="rate-option">
+                        <input type="radio" id="rate7" name="newRate" value="7">
+                        <label for="rate7">7%</label>
+                    </div>
+                    <div class="rate-option">
+                        <input type="radio" id="rate8" name="newRate" value="8">
+                        <label for="rate8">8%</label>
+                    </div>
+                    <div class="rate-option">
+                        <input type="radio" id="rate9" name="newRate" value="9">
+                        <label for="rate9">9%</label>
+                    </div>
+                    <div class="rate-option">
+                        <input type="radio" id="rate10" name="newRate" value="10">
+                        <label for="rate10">10%</label>
+                    </div>
+                    <div class="rate-option">
+                        <input type="radio" id="rate11" name="newRate" value="11">
+                        <label for="rate11">11%</label>
+                    </div>
+                    <div class="rate-option">
+                        <input type="radio" id="rate12" name="newRate" value="12">
+                        <label for="rate12">12%</label>
+                    </div>
+                    <div class="rate-option">
+                        <input type="radio" id="rate13" name="newRate" value="13">
+                        <label for="rate13">13%</label>
+                    </div>
+                    <div class="rate-option">
+                        <input type="radio" id="rate14" name="newRate" value="14">
+                        <label for="rate14">14%</label>
+                    </div>
+                    <div class="rate-option">
+                        <input type="radio" id="rate15" name="newRate" value="15">
+                        <label for="rate15">15%</label>
+                    </div>
+                    <div class="rate-option no-change" style="grid-column: span 5;">
+                        <input type="radio" id="rateNoChange" name="newRate" value="no_change">
+                        <label for="rateNoChange">ไม่เปลี่ยนแปลงอัตราสะสม</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success show" id="submitBtn">บันทึก</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon">✓</div>
+            <div class="modal-title">บันทึกสำเร็จ!</div>
+            <div class="modal-message" id="modalMessage">
+                ระบบจะดำเนินการเปลี่ยนแปลงอัตราเงินสะสมของคุณในเดือนถัดไป
+            </div>
+            <button class="modal-button" onclick="closeModalAndReload()">ปิด</button>
+        </div>
+    </div>
+
+    <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwOcfh82zUBbo22Cume66ZPG87hWAhXuXTDgnJG5dGwZPCLvpemYcWX5TGWnFfXjo68/exec';
+    
+    const empIdInput = document.getElementById('empId');
+    const searchBtn = document.getElementById('searchBtn');
+    const infoBox = document.getElementById('infoBox');
+    const rateSelection = document.getElementById('rateSelection');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const loading = document.getElementById('loading');
+    const surveyForm = document.getElementById('surveyForm');
+    const successModal = document.getElementById('successModal');
+    const modalMessage = document.getElementById('modalMessage');
+
+    let currentEmployee = null;
+
+    function getMinimumRate(yearsOfService) {
+        if (yearsOfService < 10) {
+            return 6;
+        } else if (yearsOfService >= 10 && yearsOfService < 20) {
+            return 7;
+        } else {
+            return 8;
+        }
+    }
+
+    function updateRateOptions(minimumRate) {
+        const allRates = document.querySelectorAll('.rate-option');
+        allRates.forEach(option => {
+            if (option.classList.contains('no-change')) {
+                return;
+            }
+            
+            const radio = option.querySelector('input[type="radio"]');
+            const rateValue = parseInt(radio.value);
+            
+            if (rateValue < minimumRate) {
+                option.classList.add('disabled');
+                radio.disabled = true;
+                radio.checked = false; 
+            } else {
+                option.classList.remove('disabled');
+                radio.disabled = false;
+            }
+        });
+    }
+
+    async function saveSurvey(data) {
+        try {
+            console.log('🔄 กำลังส่งข้อมูล:', data);
+            
+            const params = new URLSearchParams({
+                action: 'save',
+                empId: data.empId,
+                division: data.division,
+                department: data.department,
+                workgroup: data.workgroup,
+                currentRate: data.currentRate,
+                newRate: data.newRate,
+                timestamp: data.timestamp
+            });
+            
+            const url = `${SCRIPT_URL}?${params.toString()}`;
+            console.log('📡 Request URL:', url);
+            
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                let errorText = await response.text();
+                console.error(`❌ HTTP Error: ${response.status} - ${response.statusText}`);
+                console.error('Apps Script Response:', errorText);
+                throw new Error(`Server returned HTTP status ${response.status}`);
+            }
+            
+            const result = await response.json();
+            console.log('✅ Response จาก Server:', result);
+
+            if (result.success) {
+                console.log("✅ บันทึกสำเร็จ:", result.message);
+                return result;
+            } else {
+                console.error("❌ Error from Apps Script:", result.error);
+                throw new Error(result.error || 'เกิดข้อผิดพลาดจาก Server');
+            }
+
+        } catch (error) {
+            console.error("❌ Final Error saving survey:", error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async function searchEmployee(empId) {
+        const normalizedEmpId = empId.toUpperCase();
+        const url = `${SCRIPT_URL}?action=search&empId=${encodeURIComponent(normalizedEmpId)}`;
+        
+        try {
+            console.log('🔍 กำลังค้นหา:', url);
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                console.error(`❌ HTTP Error during search: ${response.status}`);
+                return { success: false, error: `Server error (${response.status}) during search.` };
+            }
+            
+            const result = await response.json();
+            console.log('✅ ผลการค้นหา:', result);
+            
+            return result;
+
+        } catch (error) {
+            console.error("❌ Error searching employee:", error);
+            return { success: false, error: 'Network or internal error during search.' };
+        }
+    }
+
+    function closeModalAndReload() {
+        successModal.classList.remove('show');
+        setTimeout(() => {
+            location.reload();
+        }, 300);
+    }
+    
+    searchBtn.addEventListener('click', async function() {
+        const empId = empIdInput.value.trim();
+        
+        console.log("🔍 รหัสพนักงานที่ค้นหา:", `"${empId}"`);
+        
+        if (!empId) {
+            errorMsg.textContent = 'กรุณาระบุรหัสพนักงาน';
+            errorMsg.classList.add('show');
+            return;
+        }
+
+        loading.classList.add('show');
+        searchBtn.disabled = true;
+        errorMsg.classList.remove('show');
+        infoBox.classList.remove('show');
+        rateSelection.classList.remove('show');
+
+        const employee = await searchEmployee(empId);
+
+        loading.classList.remove('show');
+        searchBtn.disabled = false;
+
+        if (employee && employee.success) {
+            currentEmployee = employee.data;
+            document.getElementById('division').textContent = employee.data.division;
+            document.getElementById('department').textContent = employee.data.department;
+            document.getElementById('workgroup').textContent = employee.data.workgroup;
+            document.getElementById('yearsOfService').textContent = employee.data.yearsOfService + ' ปี';
+            document.getElementById('currentRate').textContent = employee.data.currentRate + '%';
+            
+            const minimumRate = getMinimumRate(employee.data.yearsOfService);
+            document.getElementById('minimumRate').textContent = minimumRate + '%';
+            
+            updateRateOptions(minimumRate);
+
+            infoBox.classList.add('show');
+            rateSelection.classList.add('show');
+            
+            document.querySelectorAll('input[name="newRate"]').forEach(radio => {
+                radio.checked = false;
+            });
+        } else {
+            errorMsg.textContent = employee.error || 'ไม่พบข้อมูลพนักงาน กรุณาตรวจสอบรหัสพนักงานอีกครั้ง';
+            errorMsg.classList.add('show');
+        }
+    });
+
+    empIdInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchBtn.click();
+        }
+    });
+
+    surveyForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const selectedRate = document.querySelector('input[name="newRate"]:checked');
+        
+        if (!selectedRate) {
+            alert('กรุณาเลือกอัตราเงินสะสมที่ต้องการ');
+            return;
+        }
+
+        if (!currentEmployee) {
+            alert('เกิดข้อผิดพลาด: ข้อมูลพนักงานไม่พร้อมใช้งาน กรุณาค้นหาข้อมูลพนักงานอีกครั้ง');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'กำลังบันทึก...';
+        errorMsg.classList.remove('show');
+
+        const submissionData = {
+            empId: empIdInput.value.trim().toUpperCase(),
+            division: currentEmployee.division,
+            department: currentEmployee.department,
+            workgroup: currentEmployee.workgroup,
+            currentRate: currentEmployee.currentRate,
+            newRate: selectedRate.value,
+            timestamp: new Date().toISOString()
+        };
+
+        console.log('📤 ข้อมูลที่จะส่ง:', submissionData);
+
+        const result = await saveSurvey(submissionData);
+
+        if (result && result.success) {
+            if (selectedRate.value === 'no_change') {
+                modalMessage.textContent = 'คุณเลือกไม่เปลี่ยนแปลงอัตราเงินสะสม อัตราปัจจุบันของคุณจะยังคงเดิม';
+            } else {
+                modalMessage.textContent = `ระบบจะดำเนินการเปลี่ยนแปลงอัตราเงินสะสมของคุณเป็น ${selectedRate.value}% ในเดือนถัดไป`;
+            }
+            successModal.classList.add('show');
+        } else {
+            errorMsg.textContent = result?.error || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง';
+            errorMsg.classList.add('show');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'บันทึก';
+        }
+    });
+    </script>
+</body>
+</html>
