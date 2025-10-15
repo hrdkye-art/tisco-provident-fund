@@ -137,11 +137,15 @@
             margin-top: 15px;
         }
 
-        @media (max-width: 768px) {
-            .rate-options {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
+@media (max-width: 768px) {
+    .rate-options {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .rate-option.no-change {
+        grid-column: span 3 !important;
+    }
+}
 
         .rate-option {
             position: relative;
@@ -181,12 +185,16 @@
             transform: translateY(-2px);
         }
 
-        .rate-option.no-change label {
-            color: #dc2626;
-            font-size: 16px;
-            font-weight: 700;
-            line-height: 1.3;
-        }
+        .rate-option.no-change {
+    grid-column: span 5;
+}
+
+.rate-option.no-change label {
+    color: #dc2626;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+}
 
         .rate-option.no-change input[type="radio"]:checked + label {
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
@@ -470,7 +478,7 @@
                         <input type="radio" id="rate15" name="newRate" value="15">
                         <label for="rate15">15%</label>
                     </div>
-                    <div class="rate-option no-change" style="grid-column: span 5;">
+                    <div class="rate-option no-change">
                         <input type="radio" id="rateNoChange" name="newRate" value="no_change">
                         <label for="rateNoChange">ไม่เปลี่ยนแปลงอัตราสะสม</label>
                     </div>
@@ -518,26 +526,27 @@
         }
     }
 
-    function updateRateOptions(minimumRate) {
-        const allRates = document.querySelectorAll('.rate-option');
-        allRates.forEach(option => {
-            if (option.classList.contains('no-change')) {
-                return;
-            }
-            
-            const radio = option.querySelector('input[type="radio"]');
-            const rateValue = parseInt(radio.value);
-            
-            if (rateValue < minimumRate) {
-                option.classList.add('disabled');
-                radio.disabled = true;
-                radio.checked = false; 
-            } else {
-                option.classList.remove('disabled');
-                radio.disabled = false;
-            }
-        });
-    }
+function updateRateOptions(minimumRate, currentRate) {
+    const allRates = document.querySelectorAll('.rate-option');
+    allRates.forEach(option => {
+        if (option.classList.contains('no-change')) {
+            return;
+        }
+        
+        const radio = option.querySelector('input[type="radio"]');
+        const rateValue = parseInt(radio.value);
+        
+        // ปิดช้อยที่ต่ำกว่า minimumRate หรือเท่ากับ currentRate
+        if (rateValue < minimumRate || rateValue === currentRate) {
+            option.classList.add('disabled');
+            radio.disabled = true;
+            radio.checked = false; 
+        } else {
+            option.classList.remove('disabled');
+            radio.disabled = false;
+        }
+    });
+}
 
     async function saveSurvey(data) {
         try {
@@ -645,10 +654,10 @@
             document.getElementById('yearsOfService').textContent = employee.data.yearsOfService + ' ปี';
             document.getElementById('currentRate').textContent = employee.data.currentRate + '%';
             
-            const minimumRate = getMinimumRate(employee.data.yearsOfService);
-            document.getElementById('minimumRate').textContent = minimumRate + '%';
-            
-            updateRateOptions(minimumRate);
+          const minimumRate = getMinimumRate(employee.data.yearsOfService);
+document.getElementById('minimumRate').textContent = minimumRate + '%';
+
+updateRateOptions(minimumRate, employee.data.currentRate);
 
             infoBox.classList.add('show');
             rateSelection.classList.add('show');
@@ -688,15 +697,15 @@
         submitBtn.textContent = 'กำลังบันทึก...';
         errorMsg.classList.remove('show');
 
-        const submissionData = {
-            empId: empIdInput.value.trim().toUpperCase(),
-            division: currentEmployee.division,
-            department: currentEmployee.department,
-            workgroup: currentEmployee.workgroup,
-            currentRate: currentEmployee.currentRate,
-            newRate: selectedRate.value,
-            timestamp: new Date().toISOString()
-        };
+       const submissionData = {
+    empId: empIdInput.value.trim().toUpperCase(),
+    division: currentEmployee.division,
+    department: currentEmployee.department,
+    workgroup: currentEmployee.workgroup,
+    currentRate: currentEmployee.currentRate,
+    newRate: selectedRate.value === 'no_change' ? currentEmployee.currentRate : selectedRate.value,
+    timestamp: new Date().toISOString()
+};
 
         console.log('📤 ข้อมูลที่จะส่ง:', submissionData);
 
