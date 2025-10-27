@@ -128,15 +128,15 @@
             margin-top: 15px;
         }
 
-@media (max-width: 768px) {
-    .rate-options {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .rate-option.no-change {
-        grid-column: span 3 !important;
-    }
-}
+        @media (max-width: 768px) {
+            .rate-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .rate-option.no-change {
+                grid-column: span 3 !important;
+            }
+        }
 
         .rate-option {
             position: relative;
@@ -177,15 +177,15 @@
         }
 
         .rate-option.no-change {
-    grid-column: span 5;
-}
+            grid-column: span 5;
+        }
 
-.rate-option.no-change label {
-    color: #dc2626;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1.3;
-}
+        .rate-option.no-change label {
+            color: #dc2626;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
 
         .rate-option.no-change input[type="radio"]:checked + label {
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
@@ -287,7 +287,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Modal Popup */
         .modal {
             display: none;
             position: fixed;
@@ -478,7 +477,6 @@
         </form>
     </div>
 
-    <!-- Success Modal -->
     <div class="modal" id="successModal">
         <div class="modal-content">
             <div class="modal-icon">✓</div>
@@ -516,32 +514,29 @@
         }
     }
 
-function updateRateOptions(minimumRate, currentRate) {
-    const allRates = document.querySelectorAll('.rate-option');
-    allRates.forEach(option => {
-        if (option.classList.contains('no-change')) {
-            return;
-        }
-        
-        const radio = option.querySelector('input[type="radio"]');
-        const rateValue = parseInt(radio.value);
-        
-        // ปิดช้อยที่ต่ำกว่า minimumRate หรือเท่ากับ currentRate
-        if (rateValue < minimumRate || rateValue === currentRate) {
-            option.classList.add('disabled');
-            radio.disabled = true;
-            radio.checked = false; 
-        } else {
-            option.classList.remove('disabled');
-            radio.disabled = false;
-        }
-    });
-}
+    function updateRateOptions(minimumRate, currentRate) {
+        const allRates = document.querySelectorAll('.rate-option');
+        allRates.forEach(option => {
+            if (option.classList.contains('no-change')) {
+                return;
+            }
+            
+            const radio = option.querySelector('input[type="radio"]');
+            const rateValue = parseInt(radio.value);
+            
+            if (rateValue < minimumRate || rateValue === currentRate) {
+                option.classList.add('disabled');
+                radio.disabled = true;
+                radio.checked = false; 
+            } else {
+                option.classList.remove('disabled');
+                radio.disabled = false;
+            }
+        });
+    }
 
     async function saveSurvey(data) {
         try {
-            console.log('🔄 กำลังส่งข้อมูล:', data);
-            
             const params = new URLSearchParams({
                 action: 'save',
                 empId: data.empId,
@@ -554,30 +549,21 @@ function updateRateOptions(minimumRate, currentRate) {
             });
             
             const url = `${SCRIPT_URL}?${params.toString()}`;
-            console.log('📡 Request URL:', url);
-            
             const response = await fetch(url);
 
             if (!response.ok) {
-                let errorText = await response.text();
-                console.error(`❌ HTTP Error: ${response.status} - ${response.statusText}`);
-                console.error('Apps Script Response:', errorText);
                 throw new Error(`Server returned HTTP status ${response.status}`);
             }
             
             const result = await response.json();
-            console.log('✅ Response จาก Server:', result);
 
             if (result.success) {
-                console.log("✅ บันทึกสำเร็จ:", result.message);
                 return result;
             } else {
-                console.error("❌ Error from Apps Script:", result.error);
                 throw new Error(result.error || 'เกิดข้อผิดพลาดจาก Server');
             }
 
         } catch (error) {
-            console.error("❌ Final Error saving survey:", error);
             return { success: false, error: error.message };
         }
     }
@@ -587,22 +573,16 @@ function updateRateOptions(minimumRate, currentRate) {
         const url = `${SCRIPT_URL}?action=search&empId=${encodeURIComponent(normalizedEmpId)}`;
         
         try {
-            console.log('🔍 กำลังค้นหา:', url);
-            
             const response = await fetch(url);
             
             if (!response.ok) {
-                console.error(`❌ HTTP Error during search: ${response.status}`);
                 return { success: false, error: `Server error (${response.status}) during search.` };
             }
             
             const result = await response.json();
-            console.log('✅ ผลการค้นหา:', result);
-            
             return result;
 
         } catch (error) {
-            console.error("❌ Error searching employee:", error);
             return { success: false, error: 'Network or internal error during search.' };
         }
     }
@@ -616,8 +596,6 @@ function updateRateOptions(minimumRate, currentRate) {
     
     searchBtn.addEventListener('click', async function() {
         const empId = empIdInput.value.trim();
-        
-        console.log("🔍 รหัสพนักงานที่ค้นหา:", `"${empId}"`);
         
         if (!empId) {
             errorMsg.textContent = 'กรุณาระบุรหัสพนักงาน';
@@ -644,10 +622,10 @@ function updateRateOptions(minimumRate, currentRate) {
             document.getElementById('yearsOfService').textContent = employee.data.yearsOfService + ' ปี';
             document.getElementById('currentRate').textContent = employee.data.currentRate + '%';
             
-          const minimumRate = getMinimumRate(employee.data.yearsOfService);
-document.getElementById('minimumRate').textContent = minimumRate + '%';
+            const minimumRate = getMinimumRate(employee.data.yearsOfService);
+            document.getElementById('minimumRate').textContent = minimumRate + '%';
 
-updateRateOptions(minimumRate, employee.data.currentRate);
+            updateRateOptions(minimumRate, employee.data.currentRate);
 
             infoBox.classList.add('show');
             rateSelection.classList.add('show');
@@ -687,17 +665,15 @@ updateRateOptions(minimumRate, employee.data.currentRate);
         submitBtn.textContent = 'กำลังบันทึก...';
         errorMsg.classList.remove('show');
 
-       const submissionData = {
-    empId: empIdInput.value.trim().toUpperCase(),
-    division: currentEmployee.division,
-    department: currentEmployee.department,
-    workgroup: currentEmployee.workgroup,
-    currentRate: currentEmployee.currentRate,
-    newRate: selectedRate.value === 'no_change' ? currentEmployee.currentRate : selectedRate.value,
-    timestamp: new Date().toISOString()
-};
-
-        console.log('📤 ข้อมูลที่จะส่ง:', submissionData);
+        const submissionData = {
+            empId: empIdInput.value.trim().toUpperCase(),
+            division: currentEmployee.division,
+            department: currentEmployee.department,
+            workgroup: currentEmployee.workgroup,
+            currentRate: currentEmployee.currentRate,
+            newRate: selectedRate.value === 'no_change' ? currentEmployee.currentRate : selectedRate.value,
+            timestamp: new Date().toISOString()
+        };
 
         const result = await saveSurvey(submissionData);
 
@@ -718,4 +694,3 @@ updateRateOptions(minimumRate, employee.data.currentRate);
     </script>
 </body>
 </html>
-
